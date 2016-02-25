@@ -1,15 +1,15 @@
 #include "pairhmm.h"
 
-void pairHMM_kernel(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH], // byte
-                    uint8_t read[READ_NUM][MAX_READ_LENGTH],
-                    int haplotypeLength[HAPLOTYPE_NUM], // bases
-                    int readLength[READ_NUM], // bases
-                    uint8_t readBaseQualities[READ_NUM][MAX_READ_LENGTH],
-                    uint8_t readBaseInsertionQualities[READ_NUM][MAX_READ_LENGTH],
-                    uint8_t readDeletionQualities[READ_NUM][MAX_READ_LENGTH],
-                    uint8_t readGCP[READ_NUM][MAX_READ_LENGTH],
-                    prob_t mLikelihoodArray[READ_NUM][HAPLOTYPE_NUM]
-                    )
+void pairHMM_kernel_sw(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH], // byte
+                       uint8_t read[READ_NUM][MAX_READ_LENGTH],
+                       int haplotypeLength[HAPLOTYPE_NUM], // bases
+                       int readLength[READ_NUM], // bases
+                       uint8_t readBaseQualities[READ_NUM][MAX_READ_LENGTH],
+                       uint8_t readBaseInsertionQualities[READ_NUM][MAX_READ_LENGTH],
+                       uint8_t readDeletionQualities[READ_NUM][MAX_READ_LENGTH],
+                       uint8_t readGCP[READ_NUM][MAX_READ_LENGTH],
+                       prob_t mLikelihoodArray[READ_NUM][HAPLOTYPE_NUM]
+                       )
 {
     // prob_t mLikelihoodArray[READ_NUM][HAPLOTYPE_NUM];
     
