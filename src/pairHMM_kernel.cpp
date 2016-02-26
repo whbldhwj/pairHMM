@@ -6,7 +6,7 @@ void pairHMM_kernel(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH], // b
                     int readLength[READ_NUM], // bases
                     uint8_t readBaseQualities[READ_NUM][MAX_READ_LENGTH],
                     uint8_t readBaseInsertionQualities[READ_NUM][MAX_READ_LENGTH],
-                    uint8_t readDeletionQualities[READ_NUM][MAX_READ_LENGTH],
+                    uint8_t readBaseDeletionQualities[READ_NUM][MAX_READ_LENGTH],
                     uint8_t readGCP[READ_NUM][MAX_READ_LENGTH],
                     prob_t mLikelihoodArray[READ_NUM][HAPLOTYPE_NUM]
                     )
@@ -33,7 +33,7 @@ void pairHMM_kernel(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH], // b
     // @param processedReads reads to analyze instead of the ones present in the destination read-likelihoods
     // @param gcp penalty for gap continuation base array map for processed reads
     // -------------------------------
-    computeLikelihoods(haplotype, read, haplotypeLength, readLength, readBaseQualities, readBaseInsertionQualities, readDeletionQualities, readGCP, mLikelihoodArray);
+    computeLikelihoods(haplotype, read, haplotypeLength, readLength, readBaseQualities, readBaseInsertionQualities, readBaseDeletionQualities, readGCP, mLikelihoodArray);
     return 0;
 }
 
@@ -43,13 +43,13 @@ void computeLikelihoods(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH],
                         int readLength[READ_NUM], // bases
                         uint8_t readBaseQualities[READ_NUM][MAX_READ_LENGTH],
                         uint8_t readBaseInsertionQualities[READ_NUM][MAX_READ_LENGTH],
-                        uint8_t readDeletionQualities[READ_NUM][MAX_READ_LENGTH],
+                        uint8_t readBaseDeletionQualities[READ_NUM][MAX_READ_LENGTH],
                         uint8_t readGCP[READ_NUM][MAX_READ_LENGTH],
                         double mLikelihoodArray[READ_NUM][HAPLOTYPE_NUM])
 {
     int readIndex = 0;
     for (readIndex = 0; readIndex < READ_NUM; readIndex++)
-#pramga HLS unroll factor = 4???
+#pramga HLS unroll factor = 4
     {
         bool isFirstHaplotype = true;
         // -------------------------------
@@ -82,7 +82,7 @@ void computeLikelihoods(uint8_t haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH],
                                                                          readLength[readIndex],
                                                                          readBaseQualities[readIndex],
                                                                          readBaseInsertionQualities[readIndex],
-                                                                         readDeletionQualities[readIndex],
+                                                                         readBaseDeletionQualities[readIndex],
                                                                          readGCP[readIndex],
                                                                          isFirstHaplotype,
                                                                          (haplotypeIndex == HAPLOTYPE_NUM - 1) ?
