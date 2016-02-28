@@ -4,17 +4,18 @@
 
 int main()
 {
-    // uint8 haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH];
-    // uint8 read[READ_NUM][MAX_READ_LENGTH];
-    // int haplotypeLength[HAPLOTYPE_NUM]; // bases
-    // int readLength[READ_NUM]; // bases
-    // uint8 readBaseQualities[READ_NUM][MAX_READ_LENGTH];
-    // uint8 readInsertionQualities[READ_NUM][MAX_READ_LENGTH];
-    // uint8 readDeletionQualities[READ_NUM][MAX_READ_LENGTH];
-    // uint8 readGCP[READ_NUM][MAX_READ_LENGTH];
-    // prob_t mLikelihoodArray_sw[READ_NUM][HAPLOTYPE_NUM];
-    // prob_t mLikelihoodArray_hw[READ_NUM][HAPLOTYPE_NUM];
+    uint8 haplotype[HAPLOTYPE_NUM * MAX_HAPLOTYPE_LENGTH];
+    uint8 read[READ_NUM * MAX_READ_LENGTH];
+    int haplotypeLength[HAPLOTYPE_NUM]; // bases
+    int readLength[READ_NUM]; // bases
+    uint8 readBaseQualities[READ_NUM * MAX_READ_LENGTH];
+    uint8 readInsertionQualities[READ_NUM * MAX_READ_LENGTH];
+    uint8 readDeletionQualities[READ_NUM * MAX_READ_LENGTH];
+    uint8 readGCP[READ_NUM * MAX_READ_LENGTH];
+    prob_t mLikelihoodArray_sw[READ_NUM * HAPLOTYPE_NUM];
+    prob_t mLikelihoodArray_hw[READ_NUM * HAPLOTYPE_NUM];
 
+    /*
 	uint8* haplotype;
 	uint8* read;
 	int* haplotypeLength; // bases
@@ -25,7 +26,9 @@ int main()
 	uint8* readGCP;
 	prob_t* mLikelihoodArray_sw;
 	prob_t* mLikelihoodArray_hw;
+	*/
 
+	/*
     haplotype = (uint8*) malloc(HAPLOTYPE_NUM * MAX_HAPLOTYPE_LENGTH);
     read = (uint8*) malloc(READ_NUM * MAX_READ_LENGTH);
     haplotypeLength = (int*) malloc(HAPLOTYPE_NUM * sizeof(int));
@@ -36,6 +39,7 @@ int main()
     readGCP = (uint8*) malloc(READ_NUM * MAX_READ_LENGTH);
     mLikelihoodArray_sw = (prob_t*) malloc(READ_NUM * HAPLOTYPE_NUM * sizeof(prob_t));
     mLikelihoodArray_hw = (prob_t*) malloc(READ_NUM * HAPLOTYPE_NUM * sizeof(prob_t));
+	*/
 
     // Initialization
     for (int i = 0; i < HAPLOTYPE_NUM; i++){
@@ -80,16 +84,18 @@ int main()
     int haplotypeNum = 0;
     int readNum = 0;
     int num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		haplotypeLength[num] = length;
     		length = 0;
     		num++;
     		haplotypeNum++;
+    		base = fgetc(fp);
     	}
     	else {
     		haplotype[num * MAX_HAPLOTYPE_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -102,16 +108,18 @@ int main()
     base = fgetc(fp);
     length = 0;
     num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		readLength[num] = length;
     		length = 0;
     		num++;
     		readNum++;
+    		base = fgetc(fp);
     	}
     	else {
     		read[num * MAX_READ_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -124,14 +132,16 @@ int main()
     base = fgetc(fp);
     length = 0;
     num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		length = 0;
     		num++;
+    		base = fgetc(fp);
     	}
     	else {
     		readBaseQualities[num * MAX_READ_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -144,14 +154,16 @@ int main()
     base = fgetc(fp);
     length = 0;
     num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		length = 0;
     		num++;
+    		base = fgetc(fp);
     	}
     	else {
     		readInsertionQualities[num * MAX_READ_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -164,14 +176,16 @@ int main()
     base = fgetc(fp);
     length = 0;
     num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		length = 0;
     		num++;
+    		base = fgetc(fp);
     	}
     	else {
     		readDeletionQualities[num * MAX_READ_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -184,14 +198,16 @@ int main()
     base = fgetc(fp);
     length = 0;
     num = 0;
-    while(!feof(fp)){
+    while(base != EOF){
     	if (base == '\n'){
     		length = 0;
-    		num = num+1;
+    		num++;
+    		base = fgetc(fp);
     	}
     	else {
     		readGCP[num * MAX_READ_LENGTH + length] = (uint8)base;
     		length++;
+    		base = fgetc(fp);
     	}
     }
     fclose(fp);
@@ -204,16 +220,10 @@ int main()
     double data;
     fscanf(fp, "%lf", &data);
     length = 0;
-    num = 0;
     while(!feof(fp)){
-    	if (base == '\n'){
-    		length = 0;
-    		num++;
-    	}
-    	else {
-    		mLikelihoodArray_sw[num * HAPLOTYPE_NUM + length] = data;
-    		length++;
-    	}
+    	mLikelihoodArray_sw[length] = data;
+    	length++;
+    	fscanf(fp, "%lf", &data);
     }
     fclose(fp);
 
@@ -254,11 +264,15 @@ int main()
     int i, j;
     for (i = 0; i < READ_NUM; i++)
     {
-        for (j = 0; j < HAPLOTYPE_NUM; j++)
-        {
-            if (fabs(mLikelihoodArray_sw[i * HAPLOTYPE_NUM + j] - mLikelihoodArray_hw[i * HAPLOTYPE_NUM + j]) > 1e-15)
-                err ++;
-        }
+    	if (i < readNum) {
+    		for (j = 0; j < HAPLOTYPE_NUM; j++)
+    		{
+    			if (j < haplotypeNum) {
+    				if (fabs(mLikelihoodArray_sw[i * HAPLOTYPE_NUM + j] - mLikelihoodArray_hw[i * HAPLOTYPE_NUM + j]) > 1e-15)
+    					err ++;
+    			}
+    		}
+    	}
     }
 
     if (err > 0)

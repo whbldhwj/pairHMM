@@ -410,7 +410,7 @@ prob_t qualToProbLog10(uint8 qual)
 
 prob_t qualToErrorProb(prob_t qual)
 {
-    return pow(10.0, (qual / -10.0));
+    return pow_cal(10.0, (qual / -10.0));
 }
 
 // -------------------------------
@@ -460,9 +460,9 @@ prob_t matchToMatchProbLog10(uint8 insQual, uint8 delQual)
     int offset = 0;
     for (int i = 0; i <= MAX_QUAL; i++)
     {
+    	offset += i;
         for (int j = 0; j <= i; j++)
         {
-            offset += i;
             // prob_t log10Sum = approximateLog10SumLog10(-.1 * i, -.1 * j);
             prob_t log10Sum = myLog10SumLog10(-.1 * i, -.1 * j);
             matchToMatchLog10[offset + j] = log10_cal((prob_t)1 + (prob_t)(-min_cal((prob_t)1, (prob_t)(pow_cal(10, log10Sum))))) * INV_LN10;

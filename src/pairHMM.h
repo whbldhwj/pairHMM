@@ -2,6 +2,7 @@
 #include <ap_int.h>
 #include <math.h>
 #include <hls_math.h>
+#include <string.h>
 
 #define DEBUG
 
@@ -9,12 +10,12 @@
 typedef uint8_t uint8;
 typedef double prob_t;
 
-#define MAX_HAPLOTYPE_LENGTH 250 // bases
-#define MAX_READ_LENGTH 250 // bases
+#define MAX_HAPLOTYPE_LENGTH 100 // bases
+#define MAX_READ_LENGTH 100 // bases
 #define PADDED_MAX_HAPLOTYPE_LENGTH MAX_HAPLOTYPE_LENGTH+1 // bases
 #define PADDED_MAX_READ_LENGTH MAX_READ_LENGTH+1 // bases
-#define HAPLOTYPE_NUM 50
-#define READ_NUM 50
+#define HAPLOTYPE_NUM 10
+#define READ_NUM 10
 
 // -----------------------
 // PairHMMmodel.java -> PairHMMModel
