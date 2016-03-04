@@ -21,7 +21,7 @@ void computeLikelihoods(// uint8 haplotype[HAPLOTYPE_NUM][MAX_HAPLOTYPE_LENGTH],
 		                uint8* readGCP,
 		                prob_t* mLikelihoodArray);
 prob_t computeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
-                                                uint8 readBases[MAX_HAPLOTYPE_LENGTH],
+                                                uint8 readBases[MAX_READ_LENGTH],
                                                 int haplotypeLength, // bases
                                                 int readLength, // bases
                                                 uint8 readQuals[MAX_READ_LENGTH],
@@ -53,7 +53,7 @@ double subComputeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPL
                                                    prob_t insertionMatrix[PADDED_MAX_READ_LENGTH][PADDED_MAX_HAPLOTYPE_LENGTH],
                                                    prob_t deletionMatrix[PADDED_MAX_READ_LENGTH][PADDED_MAX_HAPLOTYPE_LENGTH]);
 int findFirstPositionWhereHaplotypesDiffer(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH], uint8 nextHaplotypeBases[MAX_HAPLOTYPE_LENGTH]);
-void initializeMatrixValues(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
+void initializeMatrixValues(// uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
                             prob_t deletionMatrix[PADDED_MAX_READ_LENGTH][PADDED_MAX_HAPLOTYPE_LENGTH],
                             int haplotypeLength);
 void initializePriors(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
@@ -228,7 +228,7 @@ void computeLikelihoods(uint8* haplotype,
 // @return the log10 probability of read coming from the haplotype under the provided error model
 // -------------------------------
 prob_t computeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
-                                                uint8 readBases[MAX_HAPLOTYPE_LENGTH],
+                                                uint8 readBases[MAX_READ_LENGTH],
                                                 int haplotypeLength, // bases
                                                 int readLength, // bases
                                                 uint8 readQuals[MAX_READ_LENGTH],
@@ -279,14 +279,14 @@ int findFirstPositionWhereHaplotypesDiffer(uint8 haplotypeBases[MAX_HAPLOTYPE_LE
             return iii;
         }
     }
-    return MAX_HAPLOTYPE_LENGTH;
+    return MAX_HAPLOTYPE_LENGTH; // This is wrong, it should be max(len(hap1), len(hap2))
 }
 
 // -------------------------------
 // Log10PairHMM.java --> subComputeReadLikelihoodGivenHaplotypeLog10()
 // -------------------------------
 double subComputeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
-                                                   uint8 readBases[MAX_HAPLOTYPE_LENGTH],
+                                                   uint8 readBases[MAX_READ_LENGTH],
                                                    int haplotypeLength,
                                                    int readLength,
                                                    uint8 readQuals[MAX_READ_LENGTH],
@@ -311,9 +311,9 @@ double subComputeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPL
     }
     static int previousHaplotypeLength = 0;
     if (recacheReadValues)
-        initializeMatrixValues(haplotypeBases, deletionMatrix, haplotypeLength);
+        initializeMatrixValues(deletionMatrix, haplotypeLength);
     else if (previousHaplotypeLength != haplotypeLength)
-        initializeMatrixValues(haplotypeBases, deletionMatrix, haplotypeLength);
+        initializeMatrixValues(deletionMatrix, haplotypeLength);
     
     initializePriors(haplotypeBases, readBases, readQuals, hapStartIndex, prior, haplotypeLength, readLength);
     int paddedHaplotypeLength, paddedReadLength;
@@ -343,12 +343,12 @@ double subComputeReadLikelihoodGivenHaplotypeLog10(uint8 haplotypeBases[MAX_HAPL
 // -------------------------------
 // Log10PairHMM.java --> initializeMatrixValues()
 // -------------------------------
-void initializeMatrixValues(uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
+void initializeMatrixValues(// uint8 haplotypeBases[MAX_HAPLOTYPE_LENGTH],
                             prob_t deletionMatrix[PADDED_MAX_READ_LENGTH][PADDED_MAX_HAPLOTYPE_LENGTH],
                             int haplotypeLength)
 {
     prob_t initialValue = log10_cal(1.0 / haplotypeLength);
-    for (int j = 0; j < PADDED_MAX_READ_LENGTH; j++)
+    for (int j = 0; j < PADDED_MAX_HAPLOTYPE_LENGTH; j++)
     {
         deletionMatrix[0][j] = initialValue;
     }
@@ -561,6 +561,6 @@ void updateCell(int indI, int indJ, prob_t* prior, prob_t transition[TRANS_PROB_
     matchMatrix[indI][indJ] = *prior +
         myLog10SumLog10(matchMatrix[indI - 1][indJ - 1] + transition[MATCH_TO_MATCH],
                         myLog10SumLog10(insertionMatrix[indI - 1][indJ - 1] + transition[INDEL_TO_MATCH], deletionMatrix[indI - 1][indJ - 1] + transition[INDEL_TO_MATCH]));
-    insertionMatrix[indI][indJ] = myLog10SumLog10(matchMatrix[indI - 1][indJ] + transition[MATCH_TO_MATCH], insertionMatrix[indI - 1][indJ] + transition[INSERTION_TO_INSERTION]);
+    insertionMatrix[indI][indJ] = myLog10SumLog10(matchMatrix[indI - 1][indJ] + transition[MATCH_TO_INSERTION], insertionMatrix[indI - 1][indJ] + transition[INSERTION_TO_INSERTION]);
     deletionMatrix[indI][indJ] = myLog10SumLog10(matchMatrix[indI][indJ - 1] + transition[MATCH_TO_DELETION], deletionMatrix[indI][indJ - 1] + transition[DELETION_TO_DELETION]);
 }

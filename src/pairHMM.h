@@ -31,7 +31,7 @@ typedef double prob_t;
 // -----------------------
 // N2MemoryPairHMM.java
 // -----------------------
-#define doNotUseTristeCorrection false
+// #define doNotUseTristeCorrection false
 
 // -----------------------
 // Log10PairHMM.java
